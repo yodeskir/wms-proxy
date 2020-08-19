@@ -1,0 +1,32 @@
+version: "3.1"
+services:
+
+    app:
+        image: 'wms-proxy'
+        build:
+            context: '.'
+            dockerfile: Dockerfile
+        ports:
+                - 8090:80
+        network_mode: "host"
+        extra_hosts:
+                - "host.docker.internal:172.17.0.1"
+        environment: 
+                - ASPNETCORE_ENVIRONMENT=linux
+                - MapServerHost=localhost
+                - ProxyToPort:80
+                - UseUrls="http://0.0.0.0:5050",
+                - AllowedUrls="mapserv","appgiswms","authenticate"
+                - SessionToken="Auth-"
+                - CookieToken="WMS.Auth= "
+                - SetCookie="set-cookie"
+                - CacheControlMaxAgeInASeconds=86400
+                - ConnectionStrings__UsersDatabase=host=127.0.0.1;port=5432;database=publicgis;user id=postgres;password=postgres;
+        deploy:
+            resources:
+                limits:
+                    cpus: '1'
+                    memory: 1024M
+                reservations:
+                    cpus: '0.50'
+                    memory: 512M

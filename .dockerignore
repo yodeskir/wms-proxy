@@ -1,0 +1,7 @@
+**/*.development.json
+**/*.Development.json
+**/bin
+**/obj
+**/packages
+**/.vs
+**/appsettings.*.json

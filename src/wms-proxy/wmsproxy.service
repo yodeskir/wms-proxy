@@ -1,0 +1,13 @@
+[Unit]
+Description=wmsproxy
+After=network.target
+ 
+[Service]
+WorkingDirectory=/home/admincentos/wmsproxy
+ExecStart=/usr/bin/dotnet /home/admincentos/wmsproxy/WMSAuthentication.dll
+Restart=on-failure
+SyslogIdentifier=wmsproxy 
+User=admincentos
+
+[Install]
+WantedBy=multi-user.target
