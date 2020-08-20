@@ -15,7 +15,7 @@ namespace WMSAuthentication
                 .AddJsonFile("appsettings.json", false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
-            var urls = configuration.GetValue("UseUrls", "http://0.0.0.0");
+            var urls = configuration.GetValue("UseUrls", "http://0.0.0.0:5050");
 
             Console.WriteLine($"Using ASPNETCORE_ENVIRONMENT = {environmentName}");
 
@@ -25,7 +25,7 @@ namespace WMSAuthentication
         public static IWebHost CreateWebHostBuilder(string[] args, string urls) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseKestrel()
-                .UseUrls(urls)
+                .UseUrls("http://*:5050")
                 .UseStartup<Startup>()
                 .Build();
     }

@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 ENV buildConfiguration=Release
 ENV solutionName=wms-proxy.sln
 ENV projectToBuild=wms-proxy/wmsproxy.csproj
+ENV ASPNETCORE_URLS=http://+:5050
 
 WORKDIR /app
 
@@ -22,5 +23,6 @@ RUN dotnet publish ${projectToBuild} -c ${buildConfiguration} -o out
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
 COPY --from=build /app/out .
+EXPOSE 5050
 ENTRYPOINT ["dotnet", "wmsproxy.dll"]
 

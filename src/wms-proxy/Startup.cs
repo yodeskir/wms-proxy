@@ -42,6 +42,7 @@ namespace WMSAuthentication
             );
 
             var optionsConnectionString = _configuration.GetConnectionString("UsersDatabase");
+            Console.WriteLine(optionsConnectionString);
             services.AddDbContext<UserDBContext>(options => options.UseNpgsql(optionsConnectionString));
             
             services.AddCors(options =>

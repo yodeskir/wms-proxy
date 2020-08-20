@@ -1,32 +1,52 @@
-version: "3.1"
+version: "3.7"
+volumes:
+    pgdata:
 services:
-
+    pgdb:
+        container_name: 'pgdb'
+        image: postgis/postgis:latest
+        volumes:
+            - pgdata:/var/lib/postgresql
+        ports:
+            - 25434:5432
+        environment:
+            - POSTGRES_DB:publicgis
+            - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting
+            - POSTGRES_USER=docker
+            - POSTGRES_PASSWORD=docker
+            - POSTGRES_HOST_AUTH_METHOD=trust
+        restart: on-failure
+        healthcheck:
+            test: "exit 0"
+        networks:
+            - wmsnetwork
     app:
         image: 'wms-proxy'
         build:
             context: '.'
             dockerfile: Dockerfile
         ports:
-                - 8090:80
-        network_mode: "host"
-        extra_hosts:
-                - "host.docker.internal:172.17.0.1"
+            - 5050:5050
+        restart: on-failure
+        links:
+            - pgdb
+        depends_on:
+            - pgdb
         environment: 
                 - ASPNETCORE_ENVIRONMENT=linux
+                - ASPNETCORE_URLS=http://+:5050
                 - MapServerHost=localhost
                 - ProxyToPort:80
-                - UseUrls="http://0.0.0.0:5050",
                 - AllowedUrls="mapserv","appgiswms","authenticate"
                 - SessionToken="Auth-"
                 - CookieToken="WMS.Auth= "
                 - SetCookie="set-cookie"
                 - CacheControlMaxAgeInASeconds=86400
-                - ConnectionStrings__UsersDatabase=host=127.0.0.1;port=5432;database=publicgis;user id=postgres;password=postgres;
-        deploy:
-            resources:
-                limits:
-                    cpus: '1'
-                    memory: 1024M
-                reservations:
-                    cpus: '0.50'
-                    memory: 512M
+                - ConnectionStrings__UsersDatabase=host=pgdb;port=5432;database=publicgis;user id=docker;password=docker;
+        expose:
+            - 5050/tcp
+        networks:
+            - wmsnetwork
+networks:
+  wmsnetwork:
+     driver: bridge
